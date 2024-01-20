@@ -44,7 +44,7 @@ import java.util.*
  * WiFi state related events.
  */
 class WiFiDirectActivity : AppCompatActivity(), ChannelListener, DeviceActionListener {
-    private lateinit var manager: WifiP2pManager
+    private var manager: WifiP2pManager? = null
     private var isWifiP2pEnabled = false
     private var retryChannel = false
 
@@ -70,9 +70,8 @@ class WiFiDirectActivity : AppCompatActivity(), ChannelListener, DeviceActionLis
 
         // add necessary intent values to be matched.
 
-
         manager = getSystemService(Context.WIFI_P2P_SERVICE) as WifiP2pManager
-        channel = manager.initialize(this, mainLooper, null)
+        channel = manager?.initialize(this, mainLooper, null)
         channel?.also { channel ->
             receiver = WiFiDirectBroadcastReceiver(manager, channel, this)
         }
@@ -141,7 +140,7 @@ class WiFiDirectActivity : AppCompatActivity(), ChannelListener, DeviceActionLis
                 val fragment = supportFragmentManager
                         .findFragmentById(R.id.frag_list) as DeviceListFragment
                 fragment.onInitiateDiscovery()
-                manager.discoverPeers(channel, object : ActionListener {
+                manager?.discoverPeers(channel, object : ActionListener {
 
                     override fun onSuccess() {
                         Log.d(TAG, "Discovery Initiated")
@@ -173,7 +172,7 @@ class WiFiDirectActivity : AppCompatActivity(), ChannelListener, DeviceActionLis
     }
 
     override fun connect(config: WifiP2pConfig) {
-        manager.connect(channel, config, object : ActionListener {
+        manager?.connect(channel, config, object : ActionListener {
 
             override fun onSuccess() {
                 // WiFiDirectBroadcastReceiver will notify us. Ignore for now.
@@ -190,7 +189,7 @@ class WiFiDirectActivity : AppCompatActivity(), ChannelListener, DeviceActionLis
         val fragment = supportFragmentManager
                 .findFragmentById(R.id.frag_detail) as DeviceDetailFragment
         fragment.resetViews()
-        manager.removeGroup(channel, object : ActionListener {
+        manager?.removeGroup(channel, object : ActionListener {
 
             override fun onFailure(reasonCode: Int) {
                 Log.d(TAG, "Disconnect failed. Reason :$reasonCode")
@@ -210,7 +209,7 @@ class WiFiDirectActivity : AppCompatActivity(), ChannelListener, DeviceActionLis
             Toast.makeText(this, "Channel lost. Trying again", Toast.LENGTH_LONG).show()
             resetData()
             retryChannel = true
-            manager.initialize(this, mainLooper, this)
+            manager?.initialize(this, mainLooper, this)
         } else {
             Toast.makeText(this,
                     "Severe! Channel is probably lost premanently. Try Disable/Re-Enable P2P.",
@@ -231,7 +230,7 @@ class WiFiDirectActivity : AppCompatActivity(), ChannelListener, DeviceActionLis
             disconnect()
         } else if (fragment.device!!.status == WifiP2pDevice.AVAILABLE || fragment.device!!.status == WifiP2pDevice.INVITED) {
 
-            manager.cancelConnect(channel, object : ActionListener {
+            manager?.cancelConnect(channel, object : ActionListener {
 
                 override fun onSuccess() {
                     Toast.makeText(this@WiFiDirectActivity, "Aborting connection",
@@ -251,11 +250,11 @@ class WiFiDirectActivity : AppCompatActivity(), ChannelListener, DeviceActionLis
     private fun createGroup() {
         manager.also { manager ->
 
-            manager.requestGroupInfo(channel) { group ->
+            manager?.requestGroupInfo(channel) { group ->
                 Log.d(TAG, "createGroup group:$group")
             }
 
-            manager.createGroup(channel, object : ActionListener {
+            manager?.createGroup(channel, object : ActionListener {
                 override fun onSuccess() {
                     Toast.makeText(this@WiFiDirectActivity, "create group success", Toast.LENGTH_SHORT).show()
                 }

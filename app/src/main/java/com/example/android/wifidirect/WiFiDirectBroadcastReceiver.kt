@@ -36,7 +36,7 @@ class WiFiDirectBroadcastReceiver(
  * @param channel Wifi p2p channel
  * @param activity activity associated with the receiver
  */
-    private val manager: WifiP2pManager,
+    private var manager: WifiP2pManager?,
     private val channel: Channel,
     private val activity: WiFiDirectActivity
 ) : BroadcastReceiver() {
@@ -70,7 +70,7 @@ class WiFiDirectBroadcastReceiver(
                 // asynchronous call and the calling activity is notified with a
                 // callback on PeerListListener.onPeersAvailable()
                 Log.d(TAG, "P2P peers changed")
-                manager.requestPeers(channel, activity.supportFragmentManager
+                manager?.requestPeers(channel, activity.supportFragmentManager
                         .findFragmentById(R.id.frag_list) as PeerListListener)
             }
             WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION -> {
@@ -85,7 +85,7 @@ class WiFiDirectBroadcastReceiver(
 
                     val fragment = activity.supportFragmentManager
                             .findFragmentById(R.id.frag_detail) as DeviceDetailFragment
-                    manager.requestConnectionInfo(channel, fragment)
+                    manager?.requestConnectionInfo(channel, fragment)
                 } else {
                     // It's a disconnect
                     activity.resetData()
