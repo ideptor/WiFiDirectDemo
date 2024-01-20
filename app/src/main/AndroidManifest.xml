@@ -2,25 +2,28 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.android.wifidirect">
 
+    <uses-sdk android:minSdkVersion="14" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <!-- If your app derives location information from Wi-Fi APIs,
     android:usesPermissionFlags="neverForLocation"
          don't include the "usesPermissionFlags" attribute. -->
-    <uses-permission android:name="android.permission.NEARBY_WIFI_DEVICES"
-        />
+    <uses-permission android:name="android.permission.NEARBY_WIFI_DEVICES"/>
+
 
     <!-- If any feature in your app relies on precise location information,
          don't include the "maxSdkVersion" attribute. -->
-    <uses-permission
+    <!--<uses-permission
         android:required="true"
         android:name="android.permission.ACCESS_FINE_LOCATION"
-        android:maxSdkVersion="32" />
+        android:maxSdkVersion="32" /> -->
     <!-- Google Play filtering -->
     <uses-feature
         android:name="android.hardware.wifi.direct"

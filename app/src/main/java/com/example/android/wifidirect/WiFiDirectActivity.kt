@@ -44,7 +44,7 @@ import java.util.*
  * WiFi state related events.
  */
 class WiFiDirectActivity : AppCompatActivity(), ChannelListener, DeviceActionListener {
-    private var manager: WifiP2pManager? = null
+    private lateinit var manager: WifiP2pManager
     private var isWifiP2pEnabled = false
     private var retryChannel = false
 
@@ -72,7 +72,7 @@ class WiFiDirectActivity : AppCompatActivity(), ChannelListener, DeviceActionLis
 
 
         manager = getSystemService(Context.WIFI_P2P_SERVICE) as WifiP2pManager
-        channel = manager?.initialize(this, mainLooper, null)
+        channel = manager.initialize(this, mainLooper, null)
         channel?.also { channel ->
             receiver = WiFiDirectBroadcastReceiver(manager, channel, this)
         }
