@@ -119,7 +119,7 @@ class WiFiDirectActivity : AppCompatActivity(), ChannelListener, DeviceActionLis
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.atn_direct_enable -> {
-                if (manager != null && channel != null) {
+                if (channel != null) {
 
                     // Since this is the system wireless settings activity, it's
                     // not going to send us a result. We will be notified by
@@ -141,7 +141,7 @@ class WiFiDirectActivity : AppCompatActivity(), ChannelListener, DeviceActionLis
                 val fragment = supportFragmentManager
                         .findFragmentById(R.id.frag_list) as DeviceListFragment
                 fragment.onInitiateDiscovery()
-                manager!!.discoverPeers(channel, object : ActionListener {
+                manager.discoverPeers(channel, object : ActionListener {
 
                     override fun onSuccess() {
                         Log.d(TAG, "Discovery Initiated")
@@ -173,7 +173,7 @@ class WiFiDirectActivity : AppCompatActivity(), ChannelListener, DeviceActionLis
     }
 
     override fun connect(config: WifiP2pConfig) {
-        manager!!.connect(channel, config, object : ActionListener {
+        manager.connect(channel, config, object : ActionListener {
 
             override fun onSuccess() {
                 // WiFiDirectBroadcastReceiver will notify us. Ignore for now.
@@ -190,7 +190,7 @@ class WiFiDirectActivity : AppCompatActivity(), ChannelListener, DeviceActionLis
         val fragment = supportFragmentManager
                 .findFragmentById(R.id.frag_detail) as DeviceDetailFragment
         fragment.resetViews()
-        manager!!.removeGroup(channel, object : ActionListener {
+        manager.removeGroup(channel, object : ActionListener {
 
             override fun onFailure(reasonCode: Int) {
                 Log.d(TAG, "Disconnect failed. Reason :$reasonCode")
@@ -206,11 +206,11 @@ class WiFiDirectActivity : AppCompatActivity(), ChannelListener, DeviceActionLis
 
     override fun onChannelDisconnected() {
         // we will try once more
-        if (manager != null && !retryChannel) {
+        if (!retryChannel) {
             Toast.makeText(this, "Channel lost. Trying again", Toast.LENGTH_LONG).show()
             resetData()
             retryChannel = true
-            manager!!.initialize(this, mainLooper, this)
+            manager.initialize(this, mainLooper, this)
         } else {
             Toast.makeText(this,
                     "Severe! Channel is probably lost premanently. Try Disable/Re-Enable P2P.",
@@ -225,33 +225,31 @@ class WiFiDirectActivity : AppCompatActivity(), ChannelListener, DeviceActionLis
          * already connected. Else, request WifiP2pManager to abort the ongoing
          * request
          */
-        if (manager != null) {
-            val fragment = supportFragmentManager
-                    .findFragmentById(R.id.frag_list) as DeviceListFragment
-            if (fragment.device == null || fragment.device!!.status == WifiP2pDevice.CONNECTED) {
-                disconnect()
-            } else if (fragment.device!!.status == WifiP2pDevice.AVAILABLE || fragment.device!!.status == WifiP2pDevice.INVITED) {
+        val fragment = supportFragmentManager
+                .findFragmentById(R.id.frag_list) as DeviceListFragment
+        if (fragment.device == null || fragment.device!!.status == WifiP2pDevice.CONNECTED) {
+            disconnect()
+        } else if (fragment.device!!.status == WifiP2pDevice.AVAILABLE || fragment.device!!.status == WifiP2pDevice.INVITED) {
 
-                manager!!.cancelConnect(channel, object : ActionListener {
+            manager.cancelConnect(channel, object : ActionListener {
 
-                    override fun onSuccess() {
-                        Toast.makeText(this@WiFiDirectActivity, "Aborting connection",
-                                Toast.LENGTH_SHORT).show()
-                    }
+                override fun onSuccess() {
+                    Toast.makeText(this@WiFiDirectActivity, "Aborting connection",
+                            Toast.LENGTH_SHORT).show()
+                }
 
-                    override fun onFailure(reasonCode: Int) {
-                        Toast.makeText(this@WiFiDirectActivity,
-                                "Connect abort request failed. Reason Code: $reasonCode",
-                                Toast.LENGTH_SHORT).show()
-                    }
-                })
-            }
+                override fun onFailure(reasonCode: Int) {
+                    Toast.makeText(this@WiFiDirectActivity,
+                            "Connect abort request failed. Reason Code: $reasonCode",
+                            Toast.LENGTH_SHORT).show()
+                }
+            })
         }
     }
 
 
     private fun createGroup() {
-        manager?.also { manager ->
+        manager.also { manager ->
 
             manager.requestGroupInfo(channel) { group ->
                 Log.d(TAG, "createGroup group:$group")
